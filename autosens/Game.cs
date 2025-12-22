@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace autosens
 {
-    public class Games
+    public class Game
     {
         public string name { get; set; }
-        public double conversionFactor { get; set; }
+        public string conversionCalc { get; set; }
         public string replacementText { get; set; }
-        public string configDirectory { get; set; }
+        public string configPathTemplate { get; set; }
+        public string configPath { get; set; }
     }
 }
