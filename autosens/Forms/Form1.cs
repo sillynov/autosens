@@ -70,11 +70,13 @@ namespace autosens
                 if(File.Exists(obj.configPath))
                 {
                     Core.changeSensitivity(obj, float.Parse(textBox1.Text));
+                    obj.currentSensitivity = Core.currentCm(obj);
+                    Storage.writeJson();
+                    label3.Text = "Current: " + obj.currentSensitivity;
                 }
                 else {                     
-                    string directoryErrorMessage = (obj.name + " configuration file not found: \"" + obj.configPath + ".\" Please enter the path to the config file below. \nYou can manually update this at \"" + Storage.jsonGamesPath + ".\" Check your user settings are up to date.");
-                    Form2 form2 = new Form2(directoryErrorMessage, obj.name);
-                    form2.ShowDialog();
+                    string directoryErrorMessage = (obj.name + " configuration file not found: \"" + obj.configPath + ".\"  \nYou can manually update this at \"" + Storage.jsonGamesPath + ".\" Check your user settings are up to date.");
+                    MessageBox.Show(directoryErrorMessage);
                 }
             }
         }
@@ -83,6 +85,26 @@ namespace autosens
         {
             Form3 form3 = new Form3("Update user settings here.");
             form3.ShowDialog();
+        }
+
+        private void comboGame_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Game obj = comboGame.SelectedItem as Game;
+            label3.Text = "Current: " + obj.currentSensitivity;
+            if(Storage.userSettings != null && Storage.userSettings.defaultSens != 0)
+            {
+                textBox1.Text = Storage.userSettings.defaultSens.ToString("0.0");
+            }
+            else
+            {
+                textBox1.Text = "";
+            }
+        }
+
+        private void Form1_Enter(object sender, EventArgs e)
+        {
+            Game obj = comboGame.SelectedItem as Game;
+            label3.Text = "Current: " + obj.currentSensitivity;
         }
     }
 }

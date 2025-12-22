@@ -1,5 +1,8 @@
-﻿using System;
+﻿using autosens.Forms;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -8,8 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Forms;
-using autosens.Forms;
-using System.Data;
 
 namespace autosens
 {
@@ -27,7 +28,7 @@ namespace autosens
         public static void changeSensitivity(Game game, float cm)
         {
             float sensitivity = CalculateSensitivity(game, cm);
-            if(sensitivity == 0f)
+            if (sensitivity == 0f)
             {
                 return;
             }
@@ -53,13 +54,14 @@ namespace autosens
                 MessageBox.Show("Error calculating sensitivity: " + ex.Message);
                 return 0f;
             }
+            sensitivity = sensitivity * (Storage.userSettings.dpi / 1600f);
             return sensitivity;
         }
 
         public static void replaceFileContents(string filePath, string searchText, float newValue)
         {
             string fileExtension = Path.GetExtension(filePath).ToLower();
-            if(fileExtension == ".sav")
+            if (fileExtension == ".sav")
             {
                 replaceBinaryContents(filePath, searchText, newValue);
             }
@@ -98,15 +100,15 @@ namespace autosens
             MessageBox.Show("Sensitivity updated from " + oldNumber + " to " + newValue.ToString("0.0##"));
         }
 
-
         private static void replaceBinaryContents(string filePath, string searchText, float newValue)
         {
             List<byte> fileData = new List<byte>(File.ReadAllBytes(filePath));
             byte[] keyPattern = Encoding.ASCII.GetBytes(searchText);
 
             int keyIndex = findPattern(fileData, keyPattern);
-            if (keyIndex == -1) { 
-                return; 
+            if (keyIndex == -1)
+            {
+                return;
             }
 
             int foundLengthHeaderIndex = -1;
@@ -196,6 +198,112 @@ namespace autosens
                 if (match) return i;
             }
             return -1;
+        }
+
+        public static string currentCm(Game game)
+        {
+            float currentSens = 0;
+            string fileExtension = Path.GetExtension(game.configPath).ToLower();
+            if (fileExtension == ".sav")
+            {
+                try
+                {
+                    currentSens = oldSensBinary(game.configPath, game.replacementText);
+                }
+                catch
+                {
+                    
+                }
+            }
+            else
+            {
+                try
+                {
+                    Console.WriteLine("Reading config for " + game.name + " at " + game.configPath);
+                    currentSens = oldSensCfg(game.configPath, game.replacementText);
+                }
+                catch
+                {
+                    
+                }
+            }
+
+            if(currentSens == 0f)
+            {
+                return "Not Found";
+            }
+
+            float finalCm = 0f;
+            string unprocessedExpression = game.reverseCalc;
+            string expressionString = unprocessedExpression.Replace("[sens]", currentSens.ToString());
+            object cm;
+            try
+            {
+                cm = new DataTable().Compute(expressionString, null);
+                finalCm = Convert.ToSingle(cm);
+                finalCm = finalCm * (Storage.userSettings.dpi / 1600f);
+            }
+            catch
+            {
+                return "Not Found";
+            }
+            return finalCm.ToString("0.0####");
+        }
+
+        private static float oldSensBinary(string filePath, string searchText)
+        {
+            List<byte> fileData = new List<byte>(File.ReadAllBytes(filePath));
+            byte[] keyPattern = Encoding.ASCII.GetBytes(searchText);
+
+            int keyIndex = findPattern(fileData, keyPattern);
+            if (keyIndex == -1)
+            {
+                return 0f;
+            }
+
+            string foundOldValue = "";
+
+            int startScan = keyIndex + keyPattern.Length;
+            for (int i = 0; i < 100; i++)
+            {
+                int currentIndex = startScan + i;
+                if (currentIndex + 4 >= fileData.Count) break;
+
+                int candidateLength = BitConverter.ToInt32(fileData.ToArray(), currentIndex);
+
+                if (candidateLength > 0 && candidateLength < 20)
+                {
+                    int valueStart = currentIndex + 4;
+                    if (valueStart + candidateLength < fileData.Count)
+                    {
+                        string candidateString = Encoding.ASCII.GetString(fileData.ToArray(), valueStart, candidateLength);
+                        string cleanString = candidateString.TrimEnd('\0');
+
+                        if (double.TryParse(cleanString, out _))
+                        {
+                            foundOldValue = cleanString;
+                            return float.Parse(foundOldValue);
+                        }
+                    }
+                }
+            }
+            return 0f;
+        }
+
+        private static float oldSensCfg(string filePath, string searchText)
+        {
+            string content = File.ReadAllText(filePath);
+
+            string pattern = $@"{Regex.Escape(searchText)}.*?(-?[0-9]+(?:\.[0-9]+)?)";
+
+            Match match = Regex.Match(content, pattern);
+
+            if (match.Success)
+            {
+                string numberString = match.Groups[1].Value;
+                return float.Parse(numberString);
+            }
+            return 0;
         }
     }
 }

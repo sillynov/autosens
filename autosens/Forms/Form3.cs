@@ -34,10 +34,24 @@ namespace autosens.Forms
             Storage.userSettings.dpi = int.Parse(textBox1.Text);
             Storage.userSettings.defaultSens = float.Parse(textBox3.Text);
             Storage.newUser = false;
-
             Storage.updateFilePaths();
             Storage.writeJson();
             Hide();
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

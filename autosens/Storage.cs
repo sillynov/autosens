@@ -42,6 +42,7 @@ namespace autosens
                 createUserSettings();
             }
             updateFilePaths();
+            updateCurrentSensitivities();
             writeJson();
         }
 
@@ -112,16 +113,31 @@ namespace autosens
         {
             gamesList = new List<Game>
                 {
-                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " " },
-                    new Game { name = "Counterstrike 2", conversionCalc = "25.977 / [cm]", configPathTemplate = "C:\\Program Files (x86)\\Steam\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " "},
-                    new Game { name = "Battlefield V", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity", configPath = " "},
-                    new Game { name = "Battlefield 4", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity", configPath = " "}
+                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", reverseCalc = "571.5 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " ", currentSensitivity = "0.0"},
+                    new Game { name = "Counterstrike 2", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "C:\\Program Files (x86)\\Steam\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " ", currentSensitivity = "0.0"},
+                    new Game { name = "Battlefield V", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0"},
+                    new Game { name = "Battlefield 4", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0"}
                 };
         }
 
         private static void createUserSettings()
         {
             userSettings = new User { dpi = 1600, steamProfileID = "0", defaultSens = 0.0f };
+        }
+
+        private static void updateCurrentSensitivities()
+        {
+            foreach (Game game in gamesList)
+            {
+                if (File.Exists(game.configPath))
+                {
+                    game.currentSensitivity = Core.currentCm(game);
+                }
+                else
+                {
+                    game.currentSensitivity = "Config file not found";
+                }
+            }
         }
     }
 }
