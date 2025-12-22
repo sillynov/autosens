@@ -104,10 +104,10 @@ namespace autosens
             List<byte> fileData = new List<byte>(File.ReadAllBytes(filePath));
             byte[] keyPattern = Encoding.ASCII.GetBytes(searchText);
 
-            int keyIndex = FindPattern(fileData, keyPattern);
-            if (keyIndex == -1) { Console.WriteLine($"Error: Key '{searchText}' not found."); return; }
-
-            Console.WriteLine($"Found Key at index {keyIndex}. Scanning for value...");
+            int keyIndex = findPattern(fileData, keyPattern);
+            if (keyIndex == -1) { 
+                return; 
+            }
 
             int foundLengthHeaderIndex = -1;
             int foundStringLength = -1;
@@ -142,7 +142,6 @@ namespace autosens
 
             if (foundLengthHeaderIndex != -1)
             {
-                Console.WriteLine($"Found Old Value: '{foundOldValue}'");
                 string finalValueToWrite = newValue.ToString();
 
                 if (foundOldValue.Contains("."))
@@ -153,7 +152,7 @@ namespace autosens
                     if (double.TryParse(newValue.ToString(), out double valAsNum))
                     {
                         finalValueToWrite = valAsNum.ToString("F" + oldDecimals);
-                        MessageBox.Show($"Updating sensitivity from " + foundOldValue + " to" + finalValueToWrite);
+                        MessageBox.Show("Sensitivity updated from " + foundOldValue + " to " + finalValueToWrite);
                     }
                 }
                 else
@@ -174,15 +173,14 @@ namespace autosens
                 fileData.InsertRange(foundLengthHeaderIndex + 4, newStringBytes);
 
                 File.WriteAllBytes(filePath, fileData.ToArray());
-                Console.WriteLine($"Success! Updated file.");
             }
             else
             {
-                Console.WriteLine("Failed. Found the key, but couldn't locate a number nearby.");
+                MessageBox.Show("Could not find the sensitivity value in the binary file.");
             }
         }
 
-        static int FindPattern(List<byte> data, byte[] pattern)
+        static int findPattern(List<byte> data, byte[] pattern)
         {
             for (int i = 0; i < data.Count - pattern.Length; i++)
             {

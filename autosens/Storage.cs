@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Windows;
 
 namespace autosens
 {
@@ -29,31 +30,34 @@ namespace autosens
             }
             else
             {
-                gamesList = new List<Game>
-                {
-                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " " },
-                    new Game { name = "Counterstrike 2", conversionCalc = "25.977 / [cm]", configPathTemplate = "C:\\Program Files (x86)\\Steam\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " "},
-                    new Game { name = "Battlefield V", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity", configPath = " "},
-                    new Game { name = "Battlefield 4", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity", configPath = " "}
-                };
+                createGamesList();
             }
 
             if (File.Exists(jsonUserSettingsPath))
             {
                 readUserSettings();
-                newUser = false;
             }
             else
             {
-                userSettings = new User { dpi = 1600, steamProfileID = "0", defaultSens = 0.0f };
+                createUserSettings();
             }
             updateFilePaths();
             writeJson();
         }
+
         public static void readGamesList()
         {
             jsonGamesString = File.ReadAllText(jsonGamesPath);
-            gamesList = JsonSerializer.Deserialize<List<Game>>(jsonGamesString);
+            try
+            {
+                gamesList = JsonSerializer.Deserialize<List<Game>>(jsonGamesString);
+            } 
+            catch (Exception e) 
+            {
+                MessageBox.Show("Error reading games list: " + e.Message + "\nReverting to default list. Original version saved at " + AppDomain.CurrentDomain.BaseDirectory + "\\Data\\gamesbackup.json");
+                File.Copy(jsonGamesPath, AppDomain.CurrentDomain.BaseDirectory + "\\Data\\gamesbackup.json", true);
+                createGamesList();
+            }
             gamesList.Sort((x, y) => x.name.CompareTo(y.name));
         }
         public static void writeGamesList()
@@ -66,6 +70,17 @@ namespace autosens
         public static void readUserSettings()
         {
             jsonUserSettingsString = File.ReadAllText(jsonUserSettingsPath);
+            try
+            {
+                userSettings = JsonSerializer.Deserialize<User>(jsonUserSettingsString);
+                newUser = false;
+            } 
+            catch (Exception e)
+            {
+                MessageBox.Show("Error reading user settings: " + e.Message + "\nReverting to default settings. Original version saved at " + AppDomain.CurrentDomain.BaseDirectory + "\\Data\\usersettingsbackup.json");
+                File.Copy(jsonUserSettingsPath, AppDomain.CurrentDomain.BaseDirectory + "\\Data\\usersettingsbackup.json", true);
+                createUserSettings();
+            }
             userSettings = JsonSerializer.Deserialize<User>(jsonUserSettingsString);
         }
         public static void writeUserSettings()
@@ -76,10 +91,8 @@ namespace autosens
 
         public static void writeJson()
         {
-            jsonGamesString = JsonSerializer.Serialize(gamesList, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(jsonGamesPath, jsonGamesString);
-            jsonUserSettingsString = JsonSerializer.Serialize(userSettings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(jsonUserSettingsPath, jsonUserSettingsString);
+            writeGamesList();
+            writeUserSettings();
         }
 
         public static void updateFilePaths()
@@ -93,6 +106,22 @@ namespace autosens
                 configPath = configPath.Replace("[STEAMID]", userSettings.steamProfileID);
                 game.configPath = configPath;
             }
+        }
+
+        private static void createGamesList()
+        {
+            gamesList = new List<Game>
+                {
+                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " " },
+                    new Game { name = "Counterstrike 2", conversionCalc = "25.977 / [cm]", configPathTemplate = "C:\\Program Files (x86)\\Steam\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " "},
+                    new Game { name = "Battlefield V", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity", configPath = " "},
+                    new Game { name = "Battlefield 4", conversionCalc = "25.977 / [cm]", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity", configPath = " "}
+                };
+        }
+
+        private static void createUserSettings()
+        {
+            userSettings = new User { dpi = 1600, steamProfileID = "0", defaultSens = 0.0f };
         }
     }
 }
