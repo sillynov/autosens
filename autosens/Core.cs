@@ -69,7 +69,7 @@ namespace autosens
         {
             string content = File.ReadAllText(filePath);
 
-            string pattern = $@"({searchText}.*?)-?[0-9]+(\.[0-9]+)?";
+            string pattern = $@"({searchText}.*?)(-?[0-9]+(?:\.[0-9]+)?)";
 
             string oldNumber = "";
 
@@ -79,14 +79,7 @@ namespace autosens
                 oldNumber = m.Groups[2].Value;
 
                 string formattedValue;
-                if (oldNumber.Contains("."))
-                {
-                    formattedValue = newValue.ToString("0.0###");
-                }
-                else
-                {
-                    formattedValue = ((int)newValue).ToString();
-                }
+                formattedValue = newValue.ToString("0.0###");
                 return prefix + formattedValue;
             });
 
