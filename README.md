@@ -12,6 +12,10 @@ Autosens currently supports:
 - The Finals
 - Valorant
 - Overwatch 2 (this is only partial support as the user data for this game is stored in the cloud. It will calculate your sensitivity but cannot automatically apply it sorry).
+- ARC Raiders (the game stores the x and y sensitivities differently so I am doing the same)
+- Apex Legends
+- Team Fortress 2
+- Battlefield 4
 
 ## User settings
 Upon startup, autosens will ask for your DPI (mandatory), your SteamID (found at `C:\Program Files (x86)\Steam\userdata`, not mandatory unless a game such as CS2 is storing the config there), and your default cm/360 (not mandatory). 
