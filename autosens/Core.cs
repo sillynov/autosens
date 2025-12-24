@@ -13,13 +13,13 @@ namespace autosens
         [STAThread]
         public static void Main()
         {
-            Storage.initializeStorage();
+            Storage.InitializeStorage();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
         }
 
-        public static void changeSensitivity(Game game, float cm)
+        public static void ChangeSensitivity(Game game, float cm)
         {
             float sensitivity = CalculateSensitivity(game, cm);
             if (sensitivity == 0f)
@@ -29,7 +29,7 @@ namespace autosens
 
             string configPath = game.configPath;
             string replacementText = game.replacementText;
-            replaceFileContents(configPath, replacementText, sensitivity);
+            ReplaceFileContents(configPath, replacementText, sensitivity);
         }
 
         public static float CalculateSensitivity(Game game, float cm)
@@ -52,20 +52,20 @@ namespace autosens
             return sensitivity;
         }
 
-        public static void replaceFileContents(string filePath, string searchText, float newValue)
+        public static void ReplaceFileContents(string filePath, string searchText, float newValue)
         {
             string fileExtension = Path.GetExtension(filePath).ToLower();
             if (fileExtension == ".sav")
             {
-                replaceBinaryContents(filePath, searchText, newValue);
+                ReplaceBinaryContents(filePath, searchText, newValue);
             }
             else
             {
-                replaceTextContents(filePath, searchText, newValue);
+                ReplaceTextContents(filePath, searchText, newValue);
             }
         }
 
-        private static void replaceTextContents(string filePath, string searchText, float newValue)
+        private static void ReplaceTextContents(string filePath, string searchText, float newValue)
         {
             string content = File.ReadAllText(filePath);
 
@@ -87,12 +87,12 @@ namespace autosens
             MessageBox.Show("Sensitivity updated from " + oldNumber + " to " + newValue.ToString("0.0##"));
         }
 
-        private static void replaceBinaryContents(string filePath, string searchText, float newValue)
+        private static void ReplaceBinaryContents(string filePath, string searchText, float newValue)
         {
             List<byte> fileData = new List<byte>(File.ReadAllBytes(filePath));
             byte[] keyPattern = Encoding.ASCII.GetBytes(searchText);
 
-            int keyIndex = findPattern(fileData, keyPattern);
+            int keyIndex = FindPattern(fileData, keyPattern);
             if (keyIndex == -1)
             {
                 return;
@@ -169,7 +169,7 @@ namespace autosens
             }
         }
 
-        static int findPattern(List<byte> data, byte[] pattern)
+        static int FindPattern(List<byte> data, byte[] pattern)
         {
             for (int i = 0; i < data.Count - pattern.Length; i++)
             {
@@ -187,7 +187,7 @@ namespace autosens
             return -1;
         }
 
-        public static string currentCm(Game game)
+        public static string GetCurrentCm(Game game)
         {
             float currentSens = 0;
             string fileExtension = Path.GetExtension(game.configPath).ToLower();
@@ -195,7 +195,7 @@ namespace autosens
             {
                 try
                 {
-                    currentSens = oldSensBinary(game.configPath, game.replacementText);
+                    currentSens = OldSensBinary(game.configPath, game.replacementText);
                 }
                 catch
                 {
@@ -207,7 +207,7 @@ namespace autosens
                 try
                 {
                     Console.WriteLine("Reading config for " + game.name + " at " + game.configPath);
-                    currentSens = oldSensCfg(game.configPath, game.replacementText);
+                    currentSens = OldSensCfg(game.configPath, game.replacementText);
                 }
                 catch
                 {
@@ -237,12 +237,12 @@ namespace autosens
             return finalCm.ToString("0.0####");
         }
 
-        private static float oldSensBinary(string filePath, string searchText)
+        private static float OldSensBinary(string filePath, string searchText)
         {
             List<byte> fileData = new List<byte>(File.ReadAllBytes(filePath));
             byte[] keyPattern = Encoding.ASCII.GetBytes(searchText);
 
-            int keyIndex = findPattern(fileData, keyPattern);
+            int keyIndex = FindPattern(fileData, keyPattern);
             if (keyIndex == -1)
             {
                 return 0f;
@@ -277,7 +277,7 @@ namespace autosens
             return 0f;
         }
 
-        private static float oldSensCfg(string filePath, string searchText)
+        private static float OldSensCfg(string filePath, string searchText)
         {
             string content = File.ReadAllText(filePath);
 

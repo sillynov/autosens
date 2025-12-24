@@ -7,7 +7,7 @@ Autosens is a tool which converts a chosen cm/360 into a given games' sensitivit
 Autosens currently supports:
 - Battlefield V
 - Battlefield 6
-- Counterstrike 2
+- Counter-Strike 2
 - Deadlock
 - The Finals
 - Valorant
