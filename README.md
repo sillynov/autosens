@@ -40,12 +40,14 @@ The other two fields (`configPath` and `currentSensitivity`) will automatically 
 
 Contributions are always welcome!
 
-If you have a new game that you think should be added to the base program, please feel free to open a pull request!
+If you have a new game that you think should be added to the base program, please feel free to open a pull request or issue!
 
 
 ## Acknowledgements
 
 Thanks to the Kovaaks team for allowing the use of their formulae, this would've been impossible without them <3
+
+Thanks to [@hytioo](https://www.github.com/hytioo) for helping with Steam Library detection and a few other things.
 
 
 ## License
