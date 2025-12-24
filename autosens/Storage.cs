@@ -23,7 +23,7 @@ namespace autosens
         public static string steamPath = GetSteamPath();
         public static string jsonUserSettingsPath = localAppDataPath + "\\autosens\\Data\\userSettings.json";
         public static string jsonGamesPath = localAppDataPath + "\\autosens\\Data\\games.json";
-        public static string version = "1.2.0";
+        public static string version = "1.2.1";
 
         public static void InitializeStorage()
         {
