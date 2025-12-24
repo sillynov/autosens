@@ -23,7 +23,8 @@ namespace autosens
         public static string steamPath = GetSteamPath();
         public static string jsonUserSettingsPath = localAppDataPath + "\\autosens\\Data\\userSettings.json";
         public static string jsonGamesPath = localAppDataPath + "\\autosens\\Data\\games.json";
-        public static string version = "1.2.2";
+        public static string version = "1.3.0";
+        public static string currentGameName = "";
 
         public static void InitializeStorage()
         {
@@ -81,6 +82,8 @@ namespace autosens
                 obj.reverseCalc,
                 obj.configPathTemplate,
                 obj.replacementText,
+                obj.notFoundText,
+                obj.allowUpdate
             }).ToList();
 
             jsonGamesString = JsonSerializer.Serialize(filteredGamesList, new JsonSerializerOptions { WriteIndented = true });
@@ -137,18 +140,19 @@ namespace autosens
         {
             gamesList = new List<Game>
                 {
-                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", reverseCalc = "571.5 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Counter-Strike 2", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[STEAM]\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Battlefield V", conversionCalc = "((166.24 / [cm]) - 3.3333) * 0.0015", reverseCalc = "166.24 / (([sens] / 0.0015) + 3.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Deadlock", conversionCalc = "12.9886 / [cm]", reverseCalc = "12.9886 / [sens]", configPathTemplate = "[STEAM]\\steamapps\\common\\Deadlock\\game\\citadel\\cfg\\user_convars_0_slot0.vcfg", replacementText = "\"sensitvity\"", configPath = " ", currentSensitivity = "0.0"}, new Game { name = "Battlefield 6", conversionCalc = "((329.16 / [cm]) - 1.3333)", reverseCalc = "329.16 / ([sens] + 1.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield 6\\settings\\steam\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Valorant", conversionCalc = "8.164 / [cm]", reverseCalc = "8.164 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\VALORANT\\Saved\\Config\\[UNKNOWN]\\Windows\\RiotUserSettings.ini", replacementText = "MouseSensitivity=", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Overwatch 2", conversionCalc = "86.591 / [cm]", reverseCalc = "86.591 / [sens]", configPathTemplate = "Overwatch's sensitivity isn't stored locally, this is just here so you can use this tool to convert your sensitivity manually", replacementText = "hi :3", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "ARC Raiders X Axis", conversionCalc = "419.9195 / [cm]", reverseCalc = "419.9195 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\PioneerGame\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "SensitivityXAxis", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "ARC Raiders Y Axis", conversionCalc = "419.9195 / [cm]", reverseCalc = "419.9195 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\PioneerGame\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "SensitivityYAxis", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Apex Legends", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "C:\\Users\\[UNKNOWN]\\Saved Games\\Respawn\\Apex\\local\\settings.cfg", replacementText = "mouse_sensitivity ", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Team Fortress 2", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[STEAM]\\steamapps\\common\\Team Fortress 2\\tf\\cfg\\config.cfg", replacementText = "sensitivity", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Battlefield 4", conversionCalc = "((166.24 / [cm]) - 3.3333)", reverseCalc = "166.24 / (([sens]) + 3.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0"},
-                    new Game { name = "Black Ops 7", conversionCalc = "86.5909 / [cm]", reverseCalc = "86.5909 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Activision\\Call of Duty\\players\\[UNKNOWN]\\g.cod25.1.0.l.txt0", replacementText = "MouseHorizontalSensibility@0;12088;6692", configPath = " ", currentSensitivity = "0.0"}
+                    new Game { name = "The Finals", conversionCalc = "571.5 / [cm]", reverseCalc = "571.5 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Discovery\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "MouseSensitivity", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Counter-Strike 2", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[STEAM]\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg", replacementText = "\"sensitivity\"", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Battlefield V", conversionCalc = "((166.24 / [cm]) - 3.3333) * 0.0015", reverseCalc = "166.24 / (([sens] / 0.0015) + 3.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield V\\settings\\PROFSAVE_profile_synced", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity in the config file should be: [SENS]. In-game it will be different, BFV is quirky like that.\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Deadlock", conversionCalc = "12.9886 / [cm]", reverseCalc = "12.9886 / [sens]", configPathTemplate = "[STEAM]\\steamapps\\common\\Deadlock\\game\\citadel\\cfg\\user_convars_0_slot0.vcfg", replacementText = "\"sensitvity\"", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true}, 
+                    new Game { name = "Battlefield 6", conversionCalc = "((329.16 / [cm]) - 1.3333)", reverseCalc = "329.16 / ([sens] + 1.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield 6\\settings\\steam\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:]", allowUpdate = true},
+                    new Game { name = "Valorant", conversionCalc = "8.164 / [cm]", reverseCalc = "8.164 / [sens]", configPathTemplate = "i hate riot games", replacementText = "play ultrakill instead", configPath = " ", currentSensitivity = "0.0", notFoundText = "Valorant stores sensitivity in the cloud, and so we sadly don't have a config file to edit.\nYour sensitivity should be: [SENS].", allowUpdate = false},
+                    new Game { name = "Overwatch 2", conversionCalc = "86.591 / [cm]", reverseCalc = "86.591 / [sens]", configPathTemplate = "meow meow meow", replacementText = "hi :3", configPath = " ", currentSensitivity = "0.0", notFoundText = "Overwatch 2 stores sensitivity in the cloud, and so we sadly don't have a config file to edit.\nYour sensitivity should be: [SENS].", allowUpdate = false},
+                    new Game { name = "ARC Raiders", conversionCalc = "419.9195 / [cm]", reverseCalc = "419.9195 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\PioneerGame\\Saved\\SaveGames\\EmbarkOptionSaveGame.sav", replacementText = "SensitivityXAxis[AND]SensitivityYAxis", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Apex Legends", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "C:\\Users\\[UNKNOWN]\\Saved Games\\Respawn\\Apex\\local\\settings.cfg", replacementText = "mouse_sensitivity ", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Team Fortress 2", conversionCalc = "25.977 / [cm]", reverseCalc = "25.977 / [sens]", configPathTemplate = "[STEAM]\\steamapps\\common\\Team Fortress 2\\tf\\cfg\\config.cfg", replacementText = "sensitivity", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Battlefield 4", conversionCalc = "((166.24 / [cm]) - 3.3333)", reverseCalc = "166.24 / (([sens]) + 3.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Black Ops 7", conversionCalc = "86.5909 / [cm]", reverseCalc = "86.5909 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Activision\\Call of Duty\\players\\[UNKNOWN]\\g.cod25.1.0.l.txt0", replacementText = "MouseHorizontalSensibility@0;12088;6692", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true},
+                    new Game { name = "Fortnite", conversionCalc = "102.880 / [cm]", reverseCalc = "102.880 / [sens]", configPathTemplate = "lmk if u find this one", replacementText = "battle bus", configPath = " ", currentSensitivity = "0.0", notFoundText = "No clue where the config file for this one is. Feel free to open an issue on the Github if you know.\nYour sensitivity should be: [SENS].", allowUpdate = false}
                 };
             Directory.CreateDirectory(localAppDataPath + "\\autosens\\Data\\");
             WriteGamesList();
@@ -176,12 +180,12 @@ namespace autosens
             }
         }
 
+        //hytioo work, i should probably figure out how it works if i decide to change anything
         private static string GetSteamPath()
         {
             string defaultPath = "C:\\Program Files (x86)\\Steam";
             string steamPath = Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Valve\\Steam", "InstallPath", defaultPath) as string;
 
-            //32 Bit
             if (string.IsNullOrEmpty(steamPath))
             {
                 steamPath = Registry.GetValue(
