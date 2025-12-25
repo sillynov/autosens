@@ -69,9 +69,9 @@ namespace autosens
                 }
                 else
                 {
-                    string sensitvity = Core.CalculateSensitivity(obj, float.Parse(textBox1.Text)).ToString("0.0000");
-                    string directoryErrorMessage = (obj.name + " configuration file not found: \"" + obj.configPath + ".\"  \nYou can manually update this path at \"" + Storage.jsonGamesPath + ".\" Check your user settings are up to date \nIf it's easier, your sensitivity should be " + sensitvity + ". (This will not work if your game is Battlefield V)");
-                    MessageBox.Show(directoryErrorMessage);
+                    Storage.currentGameName = obj.name;
+                    Form2 form2 = new Form2(obj, float.Parse(textBox1.Text));
+                    form2.ShowDialog();
                 }
             }
         }

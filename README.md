@@ -10,13 +10,14 @@ Autosens currently supports:
 - Counter-Strike 2
 - Deadlock
 - The Finals
-- Valorant (might be broken right now, if you do notice it's not working please let me know)
-- Overwatch 2 (this is only partial support as the user data for this game is stored in the cloud. It will calculate your sensitivity but cannot automatically apply it sorry)
+- Valorant (partial support)
+- Overwatch 2 (partial support)
 - ARC Raiders (the game stores the x and y sensitivities differently so I am doing the same)
 - Apex Legends
 - Team Fortress 2
 - Battlefield 4
 - Black Ops 7
+- Fortnite (partial support)
 
 ## User settings
 Upon startup, autosens will ask for your DPI (mandatory), your SteamID (found at `C:\Program Files (x86)\Steam\userdata`, not mandatory unless a game such as CS2 is storing the config there), and your default cm/360 (not mandatory). 
@@ -32,9 +33,11 @@ A formula to calculate the cm/360 from the existing sensitivity (`reverseCalc`).
 
 The file path template (`configPathTemplate`) of the games' config file. There are five possible substitutions (`[LOCALAPPDATA]`,`[APPDATA]`,`[DOCUMENTS]`,`[STEAMID]`,`[UNKNOWN]`) in order to make this work across systems however, you can simply input your individual file path if you prefer. `[UNKNOWN]` is used for user specific folders, such as Valorant, which stores the sensitivity in a subdirectory that is named after a unique Riot indentifier. To give two examples, Vaolrant is located at `[LOCALAPPDATA]\\VALORANT\\Saved\\Config\\[UNKNOWN]\\Windows\\RiotUserSettings.ini`, while CS2 is at `C:\\Program Files (x86)\\Steam\\userdata\\[STEAMID]\\730\\local\\cfg\\cs2_user_convars_0_slot0.vcfg`
 
-The name of the variable within the config file (`replacementText`). This must be unique within that file, as duplicates may result in the wrong variable being changed. Do not include the actual variable, just the text that precedes it.
+The name of the variable within the config file (`replacementText`). This must be unique within that file, as duplicates may result in the wrong variable being changed. Do not include the actual variable, just the text that precedes it. If a game has multiple sensitivities, you can split them with `[AND]`, such as the case of ARC Raiders: `replacementText = "SensitivityXAxis[AND]SensitivityYAxis"`.
 
-The other two fields (`configPath` and `currentSensitivity`) will automatically be populated by the program and can be left blank.
+The error message to show when a file isn't found (`notFoundText`). Has `[SENS]` which will have the calculated sensitivity substituted, and `[PATH]` to display the original path.
+
+Whether or not to allow a path update by the user (`allowUpdate`). This is disabled for partially supported games so as to not cause confusion.
 
 
 ## Contributing

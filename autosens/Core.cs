@@ -54,6 +54,15 @@ namespace autosens
 
         public static void ReplaceFileContents(string filePath, string searchText, float newValue)
         {
+            if(searchText.Contains("[AND]"))
+            {
+                string[] parts = searchText.Split(new string[] { "[AND]" }, StringSplitOptions.None);
+                foreach (string part in parts)
+                {
+                    ReplaceFileContents(filePath, part, newValue);
+                }
+                return;
+            }
             string fileExtension = Path.GetExtension(filePath).ToLower();
             if (fileExtension == ".sav")
             {
@@ -82,9 +91,16 @@ namespace autosens
                 formattedValue = newValue.ToString("0.0###");
                 return prefix + formattedValue;
             });
-
-            File.WriteAllText(filePath, newContent);
-            MessageBox.Show("Sensitivity updated from " + oldNumber + " to " + newValue.ToString("0.0##"));
+            if(oldNumber == "")
+            {
+                MessageBox.Show("Could not find the sensitivity value in the config file.");
+                return;
+            }
+            else
+            {
+                File.WriteAllText(filePath, newContent);
+                MessageBox.Show("Sensitivity updated from " + oldNumber + " to " + newValue.ToString("0.0##"));
+            }
         }
 
         private static void ReplaceBinaryContents(string filePath, string searchText, float newValue)
@@ -191,6 +207,22 @@ namespace autosens
         {
             float currentSens = 0;
             string fileExtension = Path.GetExtension(game.configPath).ToLower();
+            string searchText = game.replacementText;
+            if(searchText.Contains("[AND]"))
+            {
+                string[] parts = searchText.Split(new string[] { "[AND]" }, StringSplitOptions.None);
+                foreach (string part in parts)
+                {
+                    game.replacementText = part;
+                    string sensString = GetCurrentCm(game);
+                    if(sensString != "Not Found")
+                    {
+                        return sensString;
+                    }
+                }
+                game.replacementText = searchText;
+                return "Not Found";
+            }
             if (fileExtension == ".sav")
             {
                 try
