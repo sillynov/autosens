@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -88,7 +89,7 @@ namespace autosens
                 oldNumber = m.Groups[2].Value;
 
                 string formattedValue;
-                formattedValue = newValue.ToString("0.0###");
+                formattedValue = newValue.ToString("0.0###", CultureInfo.GetCultureInfo("en-US"));
                 return prefix + formattedValue;
             });
             if(oldNumber == "")
@@ -266,7 +267,7 @@ namespace autosens
             {
                 return "Not Found";
             }
-            return finalCm.ToString("0.0");
+            return finalCm.ToString("0.0#####");
         }
 
         private static float OldSensBinary(string filePath, string searchText)
@@ -319,10 +320,7 @@ namespace autosens
 
             if (match.Success)
             {
-                string numberString = "0.0";
-                
-                if(match.Groups[1].Value.Contains(","))
-                    numberString = match.Groups[1].Value.Replace(",", ".");
+                string numberString = match.Groups[1].Value.Replace(",", ".");
 
                 Console.WriteLine("Found current sensitivity: " + numberString);
                 return float.Parse(numberString);
