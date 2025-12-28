@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -88,7 +89,7 @@ namespace autosens
                 oldNumber = m.Groups[2].Value;
 
                 string formattedValue;
-                formattedValue = newValue.ToString("0.0###");
+                formattedValue = newValue.ToString("0.0###", CultureInfo.GetCultureInfo("en-US"));
                 return prefix + formattedValue;
             });
             if(oldNumber == "")
@@ -239,7 +240,7 @@ namespace autosens
                 try
                 {
                     Console.WriteLine("Reading config for " + game.name + " at " + game.configPath);
-                    currentSens = OldSensCfg(game.configPath, game.replacementText);
+                    currentSens = GetCurrentSensCfg(game.configPath, game.replacementText);
                 }
                 catch
                 {
@@ -266,7 +267,7 @@ namespace autosens
             {
                 return "Not Found";
             }
-            return finalCm.ToString("0.0");
+            return finalCm.ToString("0.0#####");
         }
 
         private static float OldSensBinary(string filePath, string searchText)
@@ -309,18 +310,19 @@ namespace autosens
             return 0f;
         }
 
-        private static float OldSensCfg(string filePath, string searchText)
+        private static float GetCurrentSensCfg(string filePath, string searchText)
         {
             string content = File.ReadAllText(filePath);
 
-            string pattern = $@"{Regex.Escape(searchText)}.*?(-?[0-9]+(?:\.[0-9]+)?)";
+            string pattern = $@"{Regex.Escape(searchText)}.*?(-?[0-9]+(?:[.,][0-9]+)?)";
 
             Match match = Regex.Match(content, pattern);
 
             if (match.Success)
             {
-                Console.WriteLine("Found old sensitivity: " + match.Groups[1].Value);
-                string numberString = match.Groups[1].Value;
+                string numberString = match.Groups[1].Value.Replace(",", ".");
+
+                Console.WriteLine("Found current sensitivity: " + numberString);
                 return float.Parse(numberString);
             }
             return 0;
