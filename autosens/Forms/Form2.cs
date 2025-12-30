@@ -39,13 +39,11 @@ namespace autosens.Forms
                     string currentGame = Storage.currentGameName;
                     foreach (Game game in Storage.gamesList)
                     {
-                        Console.WriteLine("Checking game: " + game.name + " against " + currentGame);
                         if (game.name == currentGame)
                         {
-                            Console.WriteLine(game.name + " found in games list. Updating config path...");
                             game.configPathTemplate = newPath;
                             game.configPath = newPath;
-                            Console.WriteLine("Updated config path for " + game.name + " to: " + newPath);
+                            game.userUpdatedPath = true;
                             Storage.WriteJson();
                             break;
                         }

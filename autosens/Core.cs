@@ -52,6 +52,41 @@ namespace autosens
             sensitivity = sensitivity * (1600f / Storage.userSettings.dpi);
             return sensitivity;
         }
+        public static string FindConfigPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
+            string[] pathParts = path.Split(new string[] { "[UNKNOWN]" }, StringSplitOptions.None);
+
+            if (pathParts.Length < 2)
+            {
+                return path;
+            }
+
+            string part1 = pathParts[0];
+            string part2 = pathParts[1];
+
+            string baseDir = Path.GetDirectoryName(part1);
+            if (string.IsNullOrEmpty(baseDir) || !Directory.Exists(baseDir))
+            {
+                return path;
+            }
+
+            foreach (string dir in Directory.GetDirectories(baseDir))
+            {
+                string cleanedPart2 = part2.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                string possiblePath = Path.Combine(dir, cleanedPart2);
+                if (File.Exists(possiblePath))
+                {
+                    return possiblePath;
+                }
+            }
+
+            return path;
+        }
 
         public static void ReplaceFileContents(string filePath, string searchText, float newValue)
         {
@@ -182,7 +217,7 @@ namespace autosens
             }
             else
             {
-                MessageBox.Show("Could not find the sensitivity value in the binary file.");
+                //:(
             }
         }
 
@@ -218,6 +253,7 @@ namespace autosens
                     string sensString = GetCurrentCm(game);
                     if(sensString != "Not Found")
                     {
+                        game.replacementText = searchText;
                         return sensString;
                     }
                 }
@@ -267,7 +303,7 @@ namespace autosens
             {
                 return "Not Found";
             }
-            return finalCm.ToString("0.0#####");
+            return finalCm.ToString("0.0");
         }
 
         private static float OldSensBinary(string filePath, string searchText)

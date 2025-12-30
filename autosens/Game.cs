@@ -11,5 +11,6 @@
         public string currentSensitivity { get; set; }
         public string notFoundText { get; set; }
         public bool allowUpdate { get; set; }
+        public bool userUpdatedPath { get; set; }
     }
 }
