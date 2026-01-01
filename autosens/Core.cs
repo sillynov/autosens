@@ -36,8 +36,8 @@ namespace autosens
         public static float CalculateSensitivity(Game game, float cm)
         {
             float sensitivity = 0f;
-            string unprocessedExpression = game.conversionCalc;
-            string expressionString = unprocessedExpression.Replace("[cm]", cm.ToString());
+            float conversionCm = cm * (1600f / Storage.userSettings.dpi);
+            string expressionString = game.conversionCalc.Replace("[cm]", conversionCm.ToString());
             object sens;
             try
             {
@@ -49,7 +49,6 @@ namespace autosens
                 MessageBox.Show("Error calculating sensitivity: " + ex.Message);
                 return 0f;
             }
-            sensitivity = sensitivity * (1600f / Storage.userSettings.dpi);
             return sensitivity;
         }
         public static string FindConfigPath(string path)
@@ -290,14 +289,13 @@ namespace autosens
             }
 
             float finalCm = 0f;
-            string unprocessedExpression = game.reverseCalc;
-            string expressionString = unprocessedExpression.Replace("[sens]", currentSens.ToString());
+            string expressionString = game.reverseCalc.Replace("[sens]", currentSens.ToString());
             object cm;
             try
             {
                 cm = new DataTable().Compute(expressionString, null);
                 finalCm = Convert.ToSingle(cm);
-                finalCm = finalCm * (1600f / Storage.userSettings.dpi);
+                finalCm = finalCm * (Storage.userSettings.dpi / 1600f);
             }
             catch
             {
