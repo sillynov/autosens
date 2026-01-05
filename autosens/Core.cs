@@ -36,7 +36,7 @@ namespace autosens
         public static float CalculateSensitivity(Game game, float cm)
         {
             float sensitivity = 0f;
-            float conversionCm = cm * (1600f / Storage.userSettings.dpi);
+            float conversionCm = cm * (Storage.userSettings.dpi / 1600f);
             string expressionString = game.conversionCalc.Replace("[cm]", conversionCm.ToString());
             object sens;
             try
@@ -295,7 +295,7 @@ namespace autosens
             {
                 cm = new DataTable().Compute(expressionString, null);
                 finalCm = Convert.ToSingle(cm);
-                finalCm = finalCm * (Storage.userSettings.dpi / 1600f);
+                finalCm = finalCm * (1600f / Storage.userSettings.dpi);
             }
             catch
             {
