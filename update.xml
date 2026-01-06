@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-    <version>1.4.3.0</version>
-    <url>https://github.com/sillynov/autosens/releases/download/1.4.3/autosens.zip</url>
-    <changelog>https://github.com/sillynov/autosens/releases/tag/1.4.3</changelog>
+    <version>1.4.4.0</version>
+    <url>https://github.com/sillynov/autosens/releases/download/1.4.4/autosens.zip</url>
+    <changelog>https://github.com/sillynov/autosens/releases/tag/1.4.4</changelog>
     <mandatory>false</mandatory>
 </item>
