@@ -19,6 +19,7 @@ Autosens currently supports:
 - Black Ops 7
 - Fortnite (partial support)
 - Gunfire Reborn
+- Modern Warfare III (2023)
 
 ## User settings
 Upon startup, autosens will ask for your DPI (mandatory), your SteamID (found at `C:\Program Files (x86)\Steam\userdata`, not mandatory unless a game such as CS2 is storing the config there), and your default cm/360 (not mandatory). 
