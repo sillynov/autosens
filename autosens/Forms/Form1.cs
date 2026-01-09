@@ -60,7 +60,7 @@ namespace autosens
             if (obj != null)
             {
                 Console.WriteLine("Selected game directory: " + obj.configPath);
-                if (File.Exists(obj.configPath))
+                if (File.Exists(obj.configPath) && obj.allowUpdate)
                 {
                     Core.ChangeSensitivity(obj, float.Parse(textBox1.Text));
                     obj.currentSensitivity = Core.GetCurrentCm(obj);

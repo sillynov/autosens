@@ -26,7 +26,7 @@ namespace autosens
         public static string steamPath = GetSteamPath();
         public static string jsonUserSettingsPath = localAppDataPath + "\\autosens\\Data\\userSettings.json";
         public static string jsonGamesPath = localAppDataPath + "\\autosens\\Data\\games.json";
-        public static string version = "1.4.5";
+        public static string version = "1.4.6";
         public static string currentGameName = "";
 
         public static void InitializeStorage()
@@ -183,7 +183,8 @@ namespace autosens
                     new Game { name = "Battlefield 4", conversionCalc = "((166.24 / [cm]) - 3.3333) * 0.0015", reverseCalc = "166.24 / (([sens] / 0.0015) + 3.333)", configPathTemplate = "[DOCUMENTS]\\Battlefield 4\\settings\\PROFSAVE_profile", replacementText = "GstInput.MouseSensitivity ", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS]. In-game it will be different, Battlefield is quirky like that.\nYou can update the path below:", allowUpdate = true, userUpdatedPath = false},
                     new Game { name = "Black Ops 7", conversionCalc = "86.5909 / [cm]", reverseCalc = "86.5909 / [sens]", configPathTemplate = "[LOCALAPPDATA]\\Activision\\Call of Duty\\players\\[UNKNOWN]\\g.cod25.1.0.l.txt0", replacementText = "MouseHorizontalSensibility@0;12088;6692", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true, userUpdatedPath = false},
                     new Game { name = "Fortnite", conversionCalc = "102.880 / [cm]", reverseCalc = "102.880 / [sens]", configPathTemplate = "lmk if u find this one", replacementText = "battle bus", configPath = " ", currentSensitivity = "0.0", notFoundText = "No clue where the config file for this one is. Feel free to open an issue on the Github if you know.\nYour sensitivity should be: [SENS].", allowUpdate = false, userUpdatedPath = false},
-                    new Game { name = "Gunfire Reborn", conversionCalc = "114.3 / [cm]", reverseCalc = "114.3 / [sens]", configPathTemplate = "[LOCALLOW]\\duoyi\\Gunfire Reborn\\usersetting.ini", replacementText = "201=", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true, userUpdatedPath = false}
+                    new Game { name = "Gunfire Reborn", conversionCalc = "114.3 / [cm]", reverseCalc = "114.3 / [sens]", configPathTemplate = "[LOCALLOW]\\duoyi\\Gunfire Reborn\\usersetting.ini", replacementText = "201=", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true, userUpdatedPath = false},
+                    new Game { name = "Modern Warfare III (2023)", conversionCalc = "86.5909 / [cm]", reverseCalc = "86.5909 / [sens]", configPathTemplate = "[DOCUMENTS]\\Call of Duty MWIII\\players\\[UNKNOWN]\\gamerprofile.0.BASE.cst", replacementText = "MouseHorizontalSensibility@0", configPath = " ", currentSensitivity = "0.0", notFoundText = "Couldn't locate config file at [PATH].\nYour sensitivity should be: [SENS].\nYou can update the path below:", allowUpdate = true, userUpdatedPath = false},
                 };
             Directory.CreateDirectory(localAppDataPath + "\\autosens\\Data\\");
             WriteGamesList();
