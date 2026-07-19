@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing.Text;
+using NCalc;
 
 namespace autosens.Forms
 {
@@ -19,13 +20,28 @@ namespace autosens.Forms
             InitializeComponent();
             bool allowUpdate = game.allowUpdate;
             string errorMessage = game.notFoundText;
+
             if (!allowUpdate)
             {
                 textBox1.Visible = false;
                 button1.Text = "Close";
             }
-            errorMessage = errorMessage.Replace("[SENS]", Core.CalculateSensitivity(game, cm).ToString("0.0###"));
+            float sensitivity = Core.CalculateSensitivity(game, cm);
+            errorMessage = errorMessage.Replace("[SENS]", sensitivity.ToString("0.0###"));
             errorMessage = errorMessage.Replace("[PATH]", game.configPath);
+
+            if (!string.IsNullOrEmpty(game.displayCalc))
+            {
+                string calcString = game.displayCalc.Replace("[sens]", sensitivity.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                try
+                {
+                    Expression e = new Expression(calcString);
+                    string displayValue = Convert.ToSingle(e.Evaluate()).ToString("0.###");
+                    errorMessage = errorMessage.Replace("[DISPLAYSENS]", displayValue);
+                }
+                catch { }
+            }
+
             label1.Text = errorMessage;
         }
 

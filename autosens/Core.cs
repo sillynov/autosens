@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NCalc;
 
 namespace autosens
 {
@@ -37,12 +38,15 @@ namespace autosens
         {
             float sensitivity = 0f;
             float conversionCm = cm * (Storage.userSettings.dpi / 1600f);
-            string expressionString = game.conversionCalc.Replace("[cm]", conversionCm.ToString());
-            object sens;
+
+            string expressionString = game.conversionCalc.Replace("[cm]", conversionCm.ToString(CultureInfo.InvariantCulture));
+
             try
             {
-                sens = new DataTable().Compute(expressionString, null);
+                Expression e = new Expression(expressionString);
+                object sens = e.Evaluate();
                 sensitivity = Convert.ToSingle(sens);
+                if (sensitivity < 0f) sensitivity = 0f;
             }
             catch (Exception ex)
             {
@@ -182,37 +186,27 @@ namespace autosens
 
             if (foundLengthHeaderIndex != -1)
             {
-                string finalValueToWrite = newValue.ToString();
+                string finalValueToWrite = newValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
-                if (foundOldValue.Contains("."))
+                if (finalValueToWrite.Length > foundOldValue.Length)
                 {
-                    string[] parts = foundOldValue.Split('.');
-                    int oldDecimals = parts.Length > 1 ? parts[1].Length : 0;
-
-                    if (double.TryParse(newValue.ToString(), out double valAsNum))
-                    {
-                        finalValueToWrite = valAsNum.ToString("F" + oldDecimals);
-                        MessageBox.Show("Sensitivity updated from " + foundOldValue + " to " + finalValueToWrite);
-                    }
+                    finalValueToWrite = finalValueToWrite.Substring(0, foundOldValue.Length);
                 }
-                else
+                else if (finalValueToWrite.Length < foundOldValue.Length)
                 {
-                    finalValueToWrite = ((int)double.Parse(newValue.ToString())).ToString();
+                    if (!finalValueToWrite.Contains(".")) finalValueToWrite += ".";
+                    finalValueToWrite = finalValueToWrite.PadRight(foundOldValue.Length, '0');
                 }
 
                 byte[] newStringBytes = Encoding.ASCII.GetBytes(finalValueToWrite + "\0");
-                int newLength = newStringBytes.Length;
 
-                byte[] newLengthBytes = BitConverter.GetBytes(newLength);
-                for (int k = 0; k < 4; k++)
+                for (int k = 0; k < newStringBytes.Length; k++)
                 {
-                    fileData[foundLengthHeaderIndex + k] = newLengthBytes[k];
+                    fileData[foundLengthHeaderIndex + 4 + k] = newStringBytes[k];
                 }
 
-                fileData.RemoveRange(foundLengthHeaderIndex + 4, foundStringLength);
-                fileData.InsertRange(foundLengthHeaderIndex + 4, newStringBytes);
-
                 File.WriteAllBytes(filePath, fileData.ToArray());
+                MessageBox.Show("Sensitivity updated from " + foundOldValue + " to " + finalValueToWrite);
             }
             else
             {
@@ -289,12 +283,11 @@ namespace autosens
             }
 
             float finalCm = 0f;
-            string expressionString = game.reverseCalc.Replace("[sens]", currentSens.ToString());
-            object cm;
+            string expressionString = game.reverseCalc.Replace("[sens]", currentSens.ToString(CultureInfo.InvariantCulture));
             try
             {
-                cm = new DataTable().Compute(expressionString, null);
-                finalCm = Convert.ToSingle(cm);
+                Expression e = new Expression(expressionString);
+                finalCm = Convert.ToSingle(e.Evaluate());
                 finalCm = finalCm * (1600f / Storage.userSettings.dpi);
             }
             catch
@@ -336,7 +329,7 @@ namespace autosens
                         if (double.TryParse(cleanString, out _))
                         {
                             foundOldValue = cleanString;
-                            return float.Parse(foundOldValue);
+                            return float.Parse(foundOldValue, CultureInfo.InvariantCulture);
                         }
                     }
                 }
@@ -357,7 +350,7 @@ namespace autosens
                 string numberString = match.Groups[1].Value.Replace(",", ".");
 
                 Console.WriteLine("Found current sensitivity: " + numberString);
-                return float.Parse(numberString);
+                return float.Parse(numberString, CultureInfo.InvariantCulture);
             }
             return 0;
         }

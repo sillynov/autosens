@@ -70,8 +70,15 @@ namespace autosens
                 else
                 {
                     Storage.currentGameName = obj.name;
-                    Form2 form2 = new Form2(obj, float.Parse(textBox1.Text));
-                    form2.ShowDialog();
+                    try
+                    {
+                        Form2 form2 = new Form2(obj, float.Parse(textBox1.Text));
+                        form2.ShowDialog();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error: " + ex.Message);
+                    }
                 }
             }
         }
