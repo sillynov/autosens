@@ -21,6 +21,7 @@ Autosens currently supports:
 - Gunfire Reborn
 - Modern Warfare III (2023)
 - Gundam Evolution (partial support)
+- Minecraft: Java Edition
 
 ## User settings
 Upon startup, autosens will ask for your DPI (mandatory), your SteamID (found at `C:\Program Files (x86)\Steam\userdata`, not mandatory unless a game such as CS2 is storing the config there), and your default cm/360 (not mandatory). 
@@ -38,7 +39,9 @@ The file path template (`configPathTemplate`) of the games' config file. There a
 
 The name of the variable within the config file (`replacementText`). This must be unique within that file, as duplicates may result in the wrong variable being changed. Do not include the actual variable, just the text that precedes it. If a game has multiple sensitivities, you can split them with `[AND]`, such as the case of ARC Raiders: `replacementText = "SensitivityXAxis[AND]SensitivityYAxis"`.
 
-The error message to show when a file isn't found (`notFoundText`). Has `[SENS]` which will have the calculated sensitivity substituted, and `[PATH]` to display the original path.
+The error message to show when a file isn't found (`notFoundText`). Has `[SENS]` which will have the calculated sensitivity substituted, `[DISPLAYSENS]` which is the sens to use in game if different from config, and `[PATH]` to display the original path.
+
+The calculation to get `[DISPLAYSENS]` from the field above, `displayCalc`.
 
 Whether or not to allow a path update by the user (`allowUpdate`). This is disabled for partially supported games so as to not cause confusion.
 
