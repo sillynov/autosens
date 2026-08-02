@@ -2,6 +2,7 @@
 # Autosens
 
 Autosens is a tool which converts a chosen cm/360 into a given games' sensitivity and applies it through that game's config file. It also displays the current cm/360 for supported games, and allows users to add their own games as they wish.
+I'm unfortunately not able to maintain this project anymore. Feel free to use, edit, fork, or do whatever you'd like <3
 
 ## Supported games
 Autosens currently supports:
